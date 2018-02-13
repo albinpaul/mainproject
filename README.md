@@ -1,48 +1,39 @@
 # Music Auto-Tagger
 Music auto-tagger using keras
 
+# WARNING
+* use keras == 1.0.6 for `MusicTaggerCNN`. (will fix soon)
+* use keras > 1.0.6 for `MusicTaggerCRNN`. 
 
-# WARNING! Alternatives available
-
-* IF YOU WANT A TAGGER, please also look at
-  - [compact_cnn](https://github.com/keunwoochoi/music-auto_tagging-keras/tree/master/compact_cnn) 
-* IF YOU WANT A FEATURE EXTRACTOR, lookg at either
-  - [compact_cnn](https://github.com/keunwoochoi/music-auto_tagging-keras/tree/master/compact_cnn) 
-  - [transfer learning music](https://github.com/keunwoochoi/transfer_learning_music)
-
-..because `MusicTaggerCNN` and `MusicTaggerCRNN` is based on an old (and a bit incorrect) implementation of Batch Normalization of old Keras (thanks god it worked anyway), it's quite tricky to fix. 
-
-## Keras Versions
-* use keras == 1.0.6 for `MusicTaggerCNN`.
-* use 1.2 >= keras > 1.0.6 for `MusicTaggerCRNN`. 
-* use 1.2 >= keras >= 1.1 for `compact_cnn`.
-
-
-### The prerequisite -- READ IT!
+### The prerequisite
 * You need [`keras`](http://keras.io) to run `example.py`.
   * To use your own audio file, you need [`librosa`](http://librosa.github.io/librosa/).
 * The input data shape is `(None, channel, height, width)`, i.e. following theano convention. If you're using tensorflow as your backend, you should check out `~/.keras/keras.json` if `image_dim_ordering` is set to `th`, i.e.
-
 ```json
 "image_dim_ordering": "th",
 ```
-* To use `compact_cnn`, You need to install [Kapre](https://github.com/keunwoochoi/kapre).
 
-### Files (1)
-For `MusicTaggerCNN` and `MusicTaggerCRNN`.
+### Files
+#### Files-Examples
+* [example_tagging.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/example_tagging.py): tagging example
+* [example_feat_extract.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/example_feat_extract.py): feature extraction example
 
-* [example_tagging.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/example_tagging.py): tagging example, [example_feat_extract.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/example_feat_extract.py): feature extraction example
-* [music_tagger_cnn.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/music_tagger_cnn.py), [music_tagger_crnn.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/music_tagger_crnn.py): Models
+#### Files-Models
+* [music_tagger_cnn.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/music_tagger_cnn.py)
+* [music_tagger_crnn.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/music_tagger_crnn.py)
 
-### Files (2)
-For [compact_cnn](https://github.com/keunwoochoi/music-auto_tagging-keras/tree/master/compact_cnn)
-* [`main.py`](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/compact_cnn/main.py) for examples. 
-* More info on the sub [`README.md`](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/compact_cnn/README.md).
+#### Files-utility
+* [audio_processor.py](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/audio_processor.py): compute mel-spectrogram using librosa
 
+#### Files-weights
+* Under [data/](https://github.com/keunwoochoi/music-auto_tagging-keras/tree/master/data),
+  - [music_tagger_cnn_weights_tensorflow](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_cnn_weights_tensorflow.h5)
+  - [music_tagger_crnn_weights_tensorflow](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_crnn_weights_tensorflow.h5)
+  - [music_tagger_cnn_weights_theano](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_cnn_weights_theano.h5)
+  - [music_tagger_crnn_weights_theano](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_crnn_weights_theano.h5)
 
 ### Structures
 
-Left: compact_cnn CNN, music_tager_cnn. Right: music_tagger_crnn
 ![alt text](https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/imgs/diagrams.png "structures")
 
 #### MusicTaggerCNN
@@ -76,7 +67,6 @@ Left: compact_cnn CNN, music_tager_cnn. Right: music_tagger_crnn
 ```
 
 ### Which is the better predictor?
- * UPDATE: The most efficient computation, use [`compact_cnn`](https://github.com/keunwoochoi/music-auto_tagging-keras/tree/master/compact_cnn). Otherwise read below.
  * Training: `MusicTaggerCNN` is faster than `MusicTaggerCRNN` (wall-clock time)
  * Prediction: They are more or less the same. 
  * Memory Usage: `MusicTaggerCRNN` have smaller number of trainable parameters. Actually you can even decreases the number of feature maps. The `MusicTaggerCRNN` still works quite well in the case - i.e., the current setting is a little bit rich (or redundant). With `MusicTaggerCNN`, you will see the performance decrease if you reduce down the parameters. 
@@ -129,7 +119,6 @@ data/bensound-thejazzpiano.mp3
 * Audio file: find someone around you who happened to have the preview clips. or you have to crawl the files. I would recommend you to crawl your colleagues...
 
 ### Credits
-* Compact CNN: will be updated.
 * Convnet: [*Automatic Tagging using Deep Convolutional Neural Networks*](https://scholar.google.co.kr/citations?view_op=view_citation&hl=en&user=ZrqdSu4AAAAJ&citation_for_view=ZrqdSu4AAAAJ:3fE2CSJIrl8C), Keunwoo Choi, George Fazekas, Mark Sandler
 17th International Society for Music Information Retrieval Conference, New York, USA, 2016
 * ConvRNN : [*Convolutional Recurrent Neural Networks for Music Classification*](https://scholar.google.co.kr/citations?view_op=view_citation&hl=en&user=ZrqdSu4AAAAJ&sortby=pubdate&citation_for_view=ZrqdSu4AAAAJ:ULOm3_A8WrAC), Keunwoo Choi, George Fazekas, Mark Sandler, Kyunghyun Cho, arXiv:1609.04243, 2016

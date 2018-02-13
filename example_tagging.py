@@ -5,7 +5,7 @@ from music_tagger_cnn import MusicTaggerCNN
 from music_tagger_crnn import MusicTaggerCRNN
 import audio_processor as ap
 import pdb
-
+import sys
 def sort_result(tags, preds):
     result = zip(tags, preds)
     sorted_result = sorted(result, key=lambda x: x[1], reverse=True)
@@ -22,18 +22,26 @@ def librosa_exists():
 
 
 def main(net):
-    
+    ''' *WARNIING*
+    This model use Batch Normalization, so the prediction
+    is affected by batch. Use multiple, different data 
+    samples together (at least 4) for reliable prediction.'''
+
     print('Running main() with network: %s and backend: %s' % (net, K._BACKEND))
     # setting
-    audio_paths = ['data/bensound-cute.mp3',
-                   'data/bensound-actionable.mp3',
-                   'data/bensound-dubstep.mp3',
-                   'data/bensound-thejazzpiano.mp3']
+    # audio_paths = ['data/bensound-cute.mp3',
+    #                'data/bensound-actionable.mp3',
+    #                'data/bensound-dubstep.mp3',
+    #                'data/bensound-thejazzpiano.mp3']
+    audio_paths=[]
     melgram_paths = ['data/bensound-cute.npy',
                      'data/bensound-actionable.npy',
                      'data/bensound-dubstep.npy',
                      'data/bensound-thejazzpiano.npy']
-
+    
+    for arg in sys.argv[1:]:
+        print(arg)
+        audio_paths.append(arg)
     tags = ['rock', 'pop', 'alternative', 'indie', 'electronic',
             'female vocalists', 'dance', '00s', 'alternative rock', 'jazz',
             'beautiful', 'metal', 'chillout', 'male vocalists',
@@ -48,7 +56,7 @@ def main(net):
 
     # prepare data like this
     melgrams = np.zeros((0, 1, 96, 1366))
-
+    
     if librosa_exists:
         for audio_path in audio_paths:
             melgram = ap.compute_melgram(audio_path)
@@ -57,30 +65,35 @@ def main(net):
         for melgram_path in melgram_paths:
             melgram = np.load(melgram_path)
             melgrams = np.concatenate((melgrams, melgram), axis=0)
-    # print melgrams
+   
     # load model like this
     if net == 'cnn':
-        model = MusicTaggerCNN(weights='msd',include_top=False)
+        model = MusicTaggerCNN(weights='msd')
     elif net == 'crnn':
-        model = MusicTaggerCRNN(weights='msd',include_top=False)
-    #model.summary()
+        model = MusicTaggerCRNN(weights='msd')
+    
     # predict the tags like this
-    print('Predicting... with melgrams: ', melgrams.shape)
+    print('Predicting...')
     start = time.time()
     pred_tags = model.predict(melgrams)
     # print like this...
-    print("Prediction is done. It took %d seconds." % (time.time()-start))
+    print ("Prediction is done. It took %d seconds." % (time.time()-start))
+    open('output.txt','w').close()
     print('Printing top-10 tags for each track...')
     for song_idx, audio_path in enumerate(audio_paths):
         sorted_result = sort_result(tags, pred_tags[song_idx, :].tolist())
-        print(audio_path)
-        print(sorted_result)
-        print(' ')
 
+        # print(audio_path)
+        # print(sorted_result[:5])
+        # print(sorted_result[5:10])
+        # print(' ')
+        with open('output.txt','a') as f:
+            f.write(sorted_result[0][0])
+            f.write('\n')
     return
 
 if __name__ == '__main__':
 
-    networks = ['crnn']
+    networks = [ 'crnn']
     for net in networks:
         main(net)

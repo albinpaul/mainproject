@@ -13,6 +13,7 @@ def compute_melgram(audio_path):
     More info: http://librosa.github.io/librosa/generated/librosa.core.load.html#librosa.core.load
 
     '''
+
     # mel-spectrogram parameters
     SR = 12000
     N_FFT = 512

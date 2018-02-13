@@ -1,0 +1,4 @@
+C:\Users\Kattooparambil\Music\[KeralaMAX.com]Solomanum_Shoshannayum-=[-Kerala_Max-2013-]=-.mp3
+C:\Users\Kattooparambil\Music\[KeralaMAX.com]Theyyaram-=[-KeralaMax-2012-]=-.mp3
+
+python example_tagging.py "C:\Users\Kattooparambil\Music\[KeralaMAX.com]Theyyaram-=[-KeralaMax-2012-]=-.mp3" C:\Users\Kattooparambil\Music\[KeralaMAX.com]Solomanum_Shoshannayum-=[-Kerala_Max-2013-]=-.mp3

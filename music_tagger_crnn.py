@@ -19,7 +19,7 @@ from keras.utils.data_utils import get_file
 
 TH_WEIGHTS_PATH = 'https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_crnn_weights_theano.h5'
 TF_WEIGHTS_PATH = 'https://github.com/keunwoochoi/music-auto_tagging-keras/blob/master/data/music_tagger_crnn_weights_tensorflow.h5'
-#K.set_image_data_format('channels_last')
+
 
 def MusicTaggerCRNN(weights='msd', input_tensor=None,
                     include_top=True):
@@ -59,14 +59,13 @@ def MusicTaggerCRNN(weights='msd', input_tensor=None,
                          '(pre-training on Million Song Dataset).')
 
     # Determine proper input shape
-    if K.image_dim_ordering() == "th":
+    if K.image_dim_ordering() == 'th':
         input_shape = (1, 96, 1366)
     else:
         input_shape = (96, 1366, 1)
 
     if input_tensor is None:
         melgram_input = Input(shape=input_shape)
-        
     else:
         if not K.is_keras_tensor(input_tensor):
             melgram_input = Input(tensor=input_tensor, shape=input_shape)
@@ -74,7 +73,7 @@ def MusicTaggerCRNN(weights='msd', input_tensor=None,
             melgram_input = input_tensor
 
     # Determine input axis
-    if K.image_dim_ordering() == "th":
+    if K.image_dim_ordering() == 'th':
         channel_axis = 1
         freq_axis = 2
         time_axis = 3
@@ -85,35 +84,35 @@ def MusicTaggerCRNN(weights='msd', input_tensor=None,
 
     # Input block
     x = ZeroPadding2D(padding=(0, 37))(melgram_input)
-    x = BatchNormalization(axis=freq_axis, name='bn_0_freq')(x)
+    x = BatchNormalization(axis=time_axis, name='bn_0_freq')(x)
 
     # Conv block 1
     x = Convolution2D(64, 3, 3, border_mode='same', name='conv1')(x)
     x = BatchNormalization(axis=channel_axis, mode=0, name='bn1')(x)
     x = ELU()(x)
     x = MaxPooling2D(pool_size=(2, 2), strides=(2, 2), name='pool1')(x)
-    x = Dropout(0.1, name='dropout1')(x)
+    x = Dropout(0.5, name='dropout1')(x)
 
     # Conv block 2
     x = Convolution2D(128, 3, 3, border_mode='same', name='conv2')(x)
     x = BatchNormalization(axis=channel_axis, mode=0, name='bn2')(x)
     x = ELU()(x)
     x = MaxPooling2D(pool_size=(3, 3), strides=(3, 3), name='pool2')(x)
-    x = Dropout(0.1, name='dropout2')(x)
+    x = Dropout(0.5, name='dropout2')(x)
 
     # Conv block 3
     x = Convolution2D(128, 3, 3, border_mode='same', name='conv3')(x)
     x = BatchNormalization(axis=channel_axis, mode=0, name='bn3')(x)
     x = ELU()(x)
     x = MaxPooling2D(pool_size=(4, 4), strides=(4, 4), name='pool3')(x)
-    x = Dropout(0.1, name='dropout3')(x)
+    x = Dropout(0.5, name='dropout3')(x)
 
     # Conv block 4
     x = Convolution2D(128, 3, 3, border_mode='same', name='conv4')(x)
     x = BatchNormalization(axis=channel_axis, mode=0, name='bn4')(x)
     x = ELU()(x)
     x = MaxPooling2D(pool_size=(4, 4), strides=(4, 4), name='pool4')(x)
-    x = Dropout(0.1, name='dropout4')(x)
+    x = Dropout(0.5, name='dropout4')(x)
 
     # reshaping
     if K.image_dim_ordering() == 'th':
@@ -129,18 +128,14 @@ def MusicTaggerCRNN(weights='msd', input_tensor=None,
 
     # Create model
     model = Model(melgram_input, x)
-
     if weights is None:
         return model
     else: 
         # Load input
-        print(weights)
-        if K.image_dim_ordering() == "tf":
+        if K.image_dim_ordering == 'tf':
             raise RuntimeError("Please set image_dim_ordering == 'th'."
                                "You can set it at ~/.keras/keras.json")
-        #base_model = Xception(include_top=True, weights='imagenet')
-        #model = Model(input=base_model.input, output=<fine-tune model>)
-        model.save_weights('data/weights_%s.h5' % K._BACKEND)
-        model.load_weights('data/music_tagger_crnn_weights_%s.h5' % K._BACKEND,by_name=True)
-        #model.load_weights('data/weights_%s.h5' % K._BACKEND,by_name=True)
+    
+        model.load_weights('data/music_tagger_crnn_weights_theano.h5',
+                           by_name=True)
         return model
